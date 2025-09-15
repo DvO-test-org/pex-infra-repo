@@ -4,7 +4,7 @@ locals {
     DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string).password
     AWS_REGION  = var.aws_region
   }))
-  web_ami_id = length(var.app_ami_id) > 0 ? var.web_ami_id : data.aws_ami.ubuntu.id
+  web_ami_id = length(var.web_ami_id) > 0 ? var.web_ami_id : data.aws_ami.ubuntu.id
 }
 
 data "aws_ami" "ubuntu" {

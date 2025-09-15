@@ -27,6 +27,12 @@ variable "github_repo" {
   description = "Github repo name"
 }
 
+variable "web_ami_id" {
+  type        = string
+  description = "AMI ID for web server"
+  default     = ""
+}
+
 variable "ec2_ro_role_name" {
   type        = string
   default     = "dev_ro_role"

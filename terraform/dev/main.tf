@@ -4,6 +4,7 @@ locals {
     DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string).password
     AWS_REGION  = var.aws_region
   }))
+  web_ami_id = length(var.app_ami_id) > 0 ? var.web_ami_id : data.aws_ami.ubuntu.id
 }
 
 data "aws_ami" "ubuntu" {
@@ -27,7 +28,7 @@ data "aws_secretsmanager_secret_version" "db_password" {
 }
 
 resource "aws_instance" "web" {
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = local.web_ami_id
   instance_type               = var.instance_type
   key_name                    = var.key_name
   iam_instance_profile        = aws_iam_instance_profile.ec2_ro_profile.name

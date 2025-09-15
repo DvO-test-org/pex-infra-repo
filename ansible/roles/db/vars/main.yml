@@ -1,0 +1,7 @@
+---
+# vars file for roles/db
+packages:
+  - git
+  - awscli
+  - mariadb-server
+  - python3-pip

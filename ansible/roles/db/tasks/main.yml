@@ -1,0 +1,7 @@
+---
+# tasks file for roles/db
+- name: Install packages
+  ansible.builtin.import_tasks: db_install.yml
+
+- name: Init DB
+  ansible.builtin.import_tasks: db_init.yml

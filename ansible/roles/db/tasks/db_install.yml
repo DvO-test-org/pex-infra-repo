@@ -1,0 +1,32 @@
+---
+- name: Install packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop: "{{ packages }}"
+  become: true
+  notify: Restart mysql
+  tags:
+    - install_mysql
+
+- name: Set mysql to listen on external IP
+  ansible.builtin.blockinfile:
+    path: /etc/mysql/my.cnf
+    block: |
+      [mysqld]
+      bind-address = 0.0.0.0
+    state: present
+  become: true
+  notify: Restart mysql
+  tags:
+    - install_mysql
+
+- name: Install MySQL-python
+  ansible.builtin.pip:
+    name:
+      - pymysql
+    state: present
+  become: true
+  tags:
+    - install_mysql

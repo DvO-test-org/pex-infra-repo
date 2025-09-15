@@ -133,6 +133,14 @@ ssh -i your-key.pem ubuntu@<bastion-public-ip>
 ssh -i your-key.pem -J ubuntu@<bastion-public-ip> ubuntu@<web-private-ip>
 ```
 
+
+# Custom AMI
+
+## Packer + Ansible
+In `packer` dir packer configuration present to build custom AMI with mysql.     
+In `ansible` dir example ansible code present.   
+It uses ansible role `db` for provisioning AMI.  
+
 ### Git hooks
 
 To install pre-commit hook clone and enter repository directory, then run:   

@@ -1,0 +1,5 @@
+---
+# defaults file for roles/db
+mysql_db: "flask_db"
+mysql_user: "admin"
+mysql_pass: "Pa55WD"

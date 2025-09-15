@@ -1,0 +1,8 @@
+---
+- name: Install DB server
+  hosts: all
+  roles:
+    - role: db
+      vars:
+        mysql_pass: "socme_secret-passwort"
+ 

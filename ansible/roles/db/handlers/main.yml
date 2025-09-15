@@ -1,0 +1,7 @@
+---
+# handlers file for roles/db
+- name: Restart mysql
+  become: true
+  ansible.builtin.systemd:
+    name: mysql
+    state: restarted

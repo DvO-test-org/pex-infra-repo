@@ -14,17 +14,17 @@ output "web_private_ip" {
 }
 
 output "elasticsearch_instance_id" {
-  value = module.elasticsearch.instance_id
+  value       = module.elasticsearch.instance_id
   description = "Elasticsearch EC2 instance ID"
 }
 
 output "elasticsearch_private_ip" {
-  value = module.elasticsearch.private_ip
+  value       = module.elasticsearch.private_ip
   description = "Elasticsearch private ip"
 }
 
 output "elasticsearch_private_url" {
-  value = module.elasticsearch.elasticsearch_url
+  value       = module.elasticsearch.elasticsearch_url
   description = "Elasticsearch private url"
 }
 

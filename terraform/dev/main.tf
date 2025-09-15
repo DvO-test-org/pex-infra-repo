@@ -1,8 +1,8 @@
 locals {
   user_data = base64encode(templatefile("${path.module}/templates/deploy_app.sh", {
-    DB_HOST = aws_db_instance.rds_demo.address
-    DB_PASSWORD          = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string).password
-    AWS_REGION           = var.aws_region
+    DB_HOST     = aws_db_instance.rds_demo.address
+    DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string).password
+    AWS_REGION  = var.aws_region
   }))
 }
 
@@ -34,7 +34,7 @@ resource "aws_instance" "web" {
   vpc_security_group_ids      = [local.sg_web_id, local.sg_db_id]
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
-  user_data = local.user_data
+  user_data                   = local.user_data
 
   tags = {
     Name = "Web_server"
@@ -45,32 +45,32 @@ resource "aws_instance" "web" {
 
 # Deploy Elasticsearch
 module "elasticsearch" {
-  source = "git@github.com:DvO-test-org/pex-es-module.git?ref=v0.1.2" 
-  
+  source = "git@github.com:DvO-test-org/pex-es-module.git?ref=v0.1.2"
+
   name_prefix = "my-elasticsearch"
   vpc_id      = module.vpc.vpc_id
   subnet_id   = module.vpc.private_subnets[0]
   key_name    = var.key_name
-  
-  instance_type       = "t3.medium"
+
+  instance_type         = "t3.medium"
   elasticsearch_version = "8.11.0"
-  cluster_name        = "my-single-node"
-  heap_size           = "2g"
+  cluster_name          = "my-single-node"
+  heap_size             = "2g"
 
   volume_size      = 20
   data_volume_size = 30
 
   allowed_cidr_blocks = [var.vpc_cidr]
-  assign_public_ip   = false 
-  ssh_sg_ids      = [aws_security_group.sg_bastion.id]
-  
+  assign_public_ip    = false
+  ssh_sg_ids          = [aws_security_group.sg_bastion.id]
+
   encrypt_volume = true
 }
 
 resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-  key_name                    = var.key_name  
+  key_name                    = var.key_name
   vpc_security_group_ids      = [local.sg_bastion_id]
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true

@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "backend" {
   tags = {
     Name    = "TF state bucket"
     Project = "PEX"
-    Task = "CM-J-3"
+    Task    = "CM-J-3"
   }
 }
 

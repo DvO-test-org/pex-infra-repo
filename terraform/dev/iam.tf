@@ -1,5 +1,5 @@
 locals {
-  rds_master_secret_arn     = aws_db_instance.rds_demo.master_user_secret[0].secret_arn
+  rds_master_secret_arn = aws_db_instance.rds_demo.master_user_secret[0].secret_arn
 }
 
 data "aws_iam_policy_document" "ec2_assume_role" {
@@ -20,7 +20,7 @@ resource "aws_iam_role" "ec2_ro_role" {
 
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
   tags = {
-    Name        =  var.ec2_ro_role_name
+    Name = var.ec2_ro_role_name
   }
 }
 
@@ -55,7 +55,7 @@ resource "aws_iam_instance_profile" "ec2_ro_profile" {
 resource "aws_iam_policy" "secrets_manager_access" {
   name        = "SecretsManager_RO_Access"
   description = "Policy to access secrets from EC2"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -73,9 +73,9 @@ resource "aws_iam_policy" "secrets_manager_access" {
       }
     ]
   })
-  
+
   tags = {
-    Name        = "SecretsManager_RO_Access"
+    Name = "SecretsManager_RO_Access"
   }
 }
 

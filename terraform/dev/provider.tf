@@ -3,8 +3,8 @@ provider "aws" {
   default_tags {
     tags = {
       Environment = "Dev"
-      Project = "PEX"
-      Task = "CM-J-3"
+      Project     = "PEX"
+      Task        = "CM-J-3"
     }
   }
 }

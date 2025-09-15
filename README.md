@@ -1,5 +1,8 @@
 # pex-infra-repo
-Infra repo
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+
+This repository contains infrastructure code for deploying a web application on AWS using Terraform.
 
 
 
@@ -8,76 +11,127 @@ Infra repo
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws provider](#requirement\_aws) | ~> 6.0 |
 
-### Local run
+
+## Quick Start
 
 To run locally:  
 
-clone repository, switch to environment directory (currently - `dev`):  
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/DvO-test-org/pex-infra-repo.git
+   cd pex-infra-repo
+   ```
+
+2. **Switch to environment directory (currently - `dev`):**
+    ```bash
+    cd terraform/dev
+    ```
+
+3. **Initialize Terraform:**
+   ```bash
+   terraform init
+   ```
+
+4. **Review planned changes:**
+   ```bash
+   terraform plan
+   ```
+
+5. **Apply infrastructure:**
+   ```bash
+   terraform apply
+   ```
+
+## Architecture
+
+The infrastructure includes:
+
+- **VPC** with 2 private and 2 public subnets across 2 availability zones
+- **NAT Gateway** for outbound traffic from private subnets
+- **2 EC2 instances**:
+  - `web` - sample web application in public subnet
+  - `bastion` - bastion host for secure infrastructure access
+- **RDS MariaDB** - managed database
+- **Security Groups** for access control
+- **elasticsearch** EC2 instance with single-node sample Elasticsearch 
+
+## Project Structure
+
 ```
-cd terraform/dev
-```
-initialize terraform:  
-```
-terraform init
-```
-review planned changes:  
-```
-terraform plan
-```
-if everythong ok, apply infrastructure code:  
-```
-terraform apply
-```
-
-### Project layout
-
-Terraform code is located in `terraform/` directory:
-
-```
-terraform
-├── core
-│   └── tf_backend
-│       ├── backend_bucket.tf
-│       └── provider.tf
-└── dev
-    ├── backend.tf
-    ├── db_maria.tf
-    ├── iam.tf
-    ├── main.tf
-    ├── outputs.tf
-    ├── provider.tf
-    ├── s3.tf
-    ├── sg.tf
-    ├── templates
-    │   ├── deploy_app.sh
-    │   └── deploy_db.sh
-    ├── terraform.tfvars
-    ├── variables.tf
-    ├── versions.tf
-    └── vpc.tf
+terraform/
+├── core/
+│   └── tf_backend/
+│       ├── backend_bucket.tf    # S3 bucket for Terraform state
+│       └── provider.tf
+└── dev/
+    ├── backend.tf               # Remote state configuration
+    ├── db_maria.tf             # RDS MariaDB
+    ├── iam.tf                  # IAM roles and policies
+    ├── main.tf                 # Main configuration
+    ├── outputs.tf              # Output values
+    ├── provider.tf             # AWS provider
+    ├── s3.tf                   # S3 bucket for backups
+    ├── sg.tf                   # Security Groups
+    ├── templates/
+    │   ├── deploy_app.sh       # Application deployment script
+    │   └── deploy_db.sh        # Database setup script
+    ├── terraform.tfvars        # Environment variables values
+    ├── variables.tf            # Variable definitions
+    ├── versions.tf             # Provider versions
+    └── vpc.tf                  # VPC and network configuration
 ```
 
-`terraform/core/` dir contains code for creation of s3 bucket for terraform state backend  
+## Security Groups
+
+| Security Group | Purpose | Rules |
+|---|---|---|
+| `sg_web` | Web server | Allows HTTP/HTTPS traffic from internet |
+| `sg_bastion` | Bastion host | Allows SSH traffic from internet |
+| `sg_db` | Database | Allows MySQL traffic within SG and from bastion SG |
+
+## Secrets
+RDS set up with managed master password, so data:  
+```hcl 
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = local.rds_master_secret_arn
+}
+```
+used to bootstrap web app  with connection information  
 
 
-Actual infrastructure code lives in `terraform/dev` directory.   
+## Variables
 
-Resources:  
-`VPC` with 2 private and 2 public subnets in 2 AZs with managed NAT gateway.  
+Variables are defined and described in `variables.tf`
+Only variable __required__ to be set in `terraform.tfvars`:
+```
+aws_account_id = 123456789012
+```
 
-2 EC2 instances:  
-  `web` - sample web app, placed in public subnet  
-  `bastion` - bastion server, the only entrypoint from the internet.  
+## Outputs
 
-`RDS` - managed MariaDB database  
+After successful deployment, the following will be displayed:
 
-Access to these instances defined by respective `Security Groups`:  
-  `sg_web` allows web traffic from the internet. Attached to `web` instance.  
-  `sg_bastion` allows ssh traffic from the internet. Attached to `bastion` instance.  
-  `sg_db` allows mysql traffic inside SG and any traffic from `sg_bastion`.  
+- Bastion instance public ip
+- Web instance public ip
+- Web instance private ip
+- Elasticsearch EC2 instance ID
+- Elasticsearch EC2 instance private ip
+- Elasticsearch private url
+- RDS endpoint
+- Web instance connection hint
 
+## Connecting to Infrastructure
+
+### SSH access via bastion:
+
+```bash
+# Connect to bastion
+ssh -i your-key.pem ubuntu@<bastion-public-ip>
+
+# Connect to web server through bastion
+ssh -i your-key.pem -J ubuntu@<bastion-public-ip> ubuntu@<web-private-ip>
+```
 
 ### Git hooks
 

@@ -7,7 +7,7 @@ locals {
     ssh = { port = 22, protocol = "tcp" },
   }
   ingress_db_rules = {
-    mysql = { port = 3306, protocol = "tcp" },
+    mysql   = { port = 3306, protocol = "tcp" },
     elastic = { port = 9200, protocol = "tcp" },
   }
   sg_web_id     = aws_security_group.sg_web.id
